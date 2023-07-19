@@ -1,0 +1,448 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_REGISTROS 50
+
+typedef struct Funcionario {
+    char nome[20];
+    double salario;
+    int categoria; // 1-Gerência 2-Supervisão 3-Operacional
+    int idade;
+} Reg;
+
+// Variáveis globais
+Reg registros[MAX_REGISTROS];
+int numRegistros = 0;
+
+// Protótipos das funções
+void incluirFuncionario();
+void alterarFuncionario();
+void listarFuncionarios();
+void eliminarFuncionario();
+void ordenarFuncionarios();
+void buscarFuncionario();
+void incluirDadosAleatorios();
+
+void relatorioTotalSalariosPorCategoria();
+void relatorioMaiorMenorSalarioPorCategoria();
+void relatorioMediaIdadePorCategoria();
+void relatorioQuantidadeFuncionariosPorFaixaSalarial();
+void relatorioFuncionarioMaisNovo();
+
+int main() {
+    int opcao;
+
+    do {
+        printf("Menu:\n");
+        printf("1) Incluir funcionário\n");
+        printf("2) Alterar funcionário\n");
+        printf("3) Listar funcionários\n");
+        printf("4) Eliminar funcionário\n");
+        printf("5) Ordenar funcionários\n");
+        printf("6) Buscar funcionário\n");
+        printf("7) Incluir dados aleatórios\n");
+        printf("8) Relatório: Total dos salários por categoria\n");
+        printf("9) Relatório: Maior e menor salário por categoria\n");
+        printf("10) Relatório: Média de idade por categoria\n");
+        printf("11) Relatório: Quantidade de funcionários por faixa salarial\n");
+        printf("12) Relatório: Nome do funcionário mais novo\n");
+        printf("0) Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        fflush(stdin);
+
+        switch (opcao) {
+            case 1:
+                incluirFuncionario();
+                break;
+            case 2:
+                alterarFuncionario();
+                break;
+            case 3:
+                listarFuncionarios();
+                break;
+            case 4:
+                eliminarFuncionario();
+                break;
+            case 5:
+                ordenarFuncionarios();
+                break;
+            case 6:
+                buscarFuncionario();
+                break;
+            case 7:
+                incluirDadosAleatorios();
+                break;
+            case 8:
+                relatorioTotalSalariosPorCategoria();
+                break;
+            case 9:
+                relatorioMaiorMenorSalarioPorCategoria();
+                break;
+            case 10:
+                relatorioMediaIdadePorCategoria();
+                break;
+            case 11:
+                relatorioQuantidadeFuncionariosPorFaixaSalarial();
+                break;
+            case 12:
+                relatorioFuncionarioMaisNovo();
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
+
+        printf("\n");
+    } while (opcao != 0);
+
+    return 0;
+}
+
+void incluirFuncionario() {
+    if (numRegistros >= MAX_REGISTROS) {
+        printf("Limite de registros alcançado!\n");
+        return;
+    }
+
+    Reg novoFuncionario;
+
+    printf("Digite o nome do funcionário: ");
+    scanf(" %[^\n]s", novoFuncionario.nome);
+
+    printf("Digite o salário do funcionário: ");
+    scanf("%lf", &novoFuncionario.salario);
+
+    printf("Digite a categoria do funcionário (1-Gerência, 2-Supervisão, 3-Operacional): ");
+    scanf("%d", &novoFuncionario.categoria);
+
+    printf("Digite a idade do funcionário: ");
+    scanf("%d", &novoFuncionario.idade);
+
+    getchar(); // Consumir o caractere de nova linha deixado pelo último scanf
+
+    registros[numRegistros] = novoFuncionario;
+    numRegistros++;
+
+    printf("Funcionário incluído com sucesso!\n");
+}
+
+
+void alterarFuncionario() {
+    int indice;
+
+    printf("Digite o índice do funcionário a ser alterado: ");
+    scanf("%d", &indice);
+
+    if (indice < 0 || indice >= numRegistros) {
+        printf("Índice inválido!\n");
+        return;
+    }
+
+    Reg *funcionario = &registros[indice];
+
+    printf("Funcionário atual:\n");
+    printf("Nome: %s\n", funcionario->nome);
+    printf("Salário: %.2lf\n", funcionario->salario);
+    printf("Categoria: %d\n", funcionario->categoria);
+    printf("Idade: %d\n", funcionario->idade);
+
+    printf("Digite o novo nome do funcionário: ");
+    scanf(" %[^\n]s", funcionario->nome);
+
+    printf("Digite o novo salário do funcionário: ");
+    scanf("%lf", &funcionario->salario);
+
+    printf("Digite a nova categoria do funcionário (1-Gerência, 2-Supervisão, 3-Operacional): ");
+    scanf("%d", &funcionario->categoria);
+
+    printf("Digite a nova idade do funcionário: ");
+    scanf("%d", &funcionario->idade);
+
+    printf("Funcionário alterado com sucesso!\n");
+}
+
+
+void listarFuncionarios() {
+    if (numRegistros == 0) {
+        printf("Nenhum funcionário cadastrado!\n");
+        return;
+    }
+
+    printf("Lista de funcionários:\n");
+    printf("------------------------------\n");
+    printf("Índice | Nome                 | Salário  | Categoria | Idade\n");
+    printf("------------------------------\n");
+
+    for (int i = 0; i < numRegistros; i++) {
+        printf("%-6d | %-20s | %-8.2lf | %-9d | %-5d\n", i, registros[i].nome, registros[i].salario,
+               registros[i].categoria, registros[i].idade);
+    }
+
+    printf("------------------------------\n");
+}
+
+void eliminarFuncionario() {
+    int indice;
+
+    printf("Digite o índice do funcionário a ser eliminado: ");
+    scanf("%d", &indice);
+
+    if (indice < 0 || indice >= numRegistros) {
+        printf("Índice inválido!\n");
+        return;
+    }
+
+    for (int i = indice; i < numRegistros - 1; i++) {
+        registros[i] = registros[i + 1];
+    }
+
+    numRegistros--;
+
+    printf("Funcionário eliminado com sucesso!\n");
+}
+
+void ordenarFuncionarios() {
+    int i, j;
+    Reg temp;
+
+    for (i = 0; i < numRegistros - 1; i++) {
+        for (j = 0; j < numRegistros - i - 1; j++) {
+            if (registros[j].salario < registros[j + 1].salario) {
+                temp = registros[j];
+                registros[j] = registros[j + 1];
+                registros[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Funcionários ordenados por salário de forma decrescente:\n");
+    for (i = 0; i < numRegistros; i++) {
+        printf("Nome: %s\n", registros[i].nome);
+        printf("Salário: %.2f\n", registros[i].salario);
+        printf("Categoria: %d\n", registros[i].categoria);
+        printf("Idade: %d\n\n", registros[i].idade);
+    }
+}
+
+void buscarFuncionario() {
+    char nome[20];
+    int encontrado = 0;
+
+    printf("Digite o nome do funcionário a ser buscado: ");
+    scanf(" %[^\n]s", nome);
+
+    for (int i = 0; i < numRegistros; i++) {
+        if (strcmp(registros[i].nome, nome) == 0) {
+            printf("Funcionário encontrado:\n");
+            printf("Nome: %s\n", registros[i].nome);
+            printf("Salário: %.2lf\n", registros[i].salario);
+            printf("Categoria: %d\n", registros[i].categoria);
+            printf("Idade: %d\n", registros[i].idade);
+            encontrado = 1;
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        printf("Funcionário não encontrado!\n");
+    }
+}
+
+
+void incluirDadosAleatorios() {
+    int quantidade;
+
+    printf("Digite a quantidade de funcionários aleatórios a serem incluídos: ");
+    scanf("%d", &quantidade);
+
+    for (int i = 0; i < quantidade; i++) {
+        Reg novoFuncionario;
+
+        // Gerar nome aleatório
+        sprintf(novoFuncionario.nome, "Funcionario%d", i + 1);
+
+        // Gerar salário aleatório entre 1000 e 5000
+        novoFuncionario.salario = (rand() % 4001) + 1000;
+
+        // Gerar categoria aleatória (1 a 3)
+        novoFuncionario.categoria = (rand() % 3) + 1;
+
+        // Gerar idade aleatória entre 18 e 65
+        novoFuncionario.idade = (rand() % 48) + 18;
+
+        registros[numRegistros] = novoFuncionario;
+        numRegistros++;
+    }
+
+    printf("Dados aleatórios incluídos com sucesso!\n");
+}
+
+
+void relatorioTotalSalariosPorCategoria() {
+    double totalGerencia = 0.0;
+    double totalSupervisao = 0.0;
+    double totalOperacional = 0.0;
+
+    for (int i = 0; i < numRegistros; i++) {
+        switch (registros[i].categoria) {
+            case 1:
+                totalGerencia += registros[i].salario;
+                break;
+            case 2:
+                totalSupervisao += registros[i].salario;
+                break;
+            case 3:
+                totalOperacional += registros[i].salario;
+                break;
+        }
+    }
+
+    printf("Relatório: Total dos salários por categoria\n");
+    printf("Gerência: %.2lf\n", totalGerencia);
+    printf("Supervisão: %.2lf\n", totalSupervisao);
+    printf("Operacional: %.2lf\n", totalOperacional);
+}
+
+void relatorioMaiorMenorSalarioPorCategoria() {
+    double maiorGerencia = 0.0, menorGerencia = 0.0;
+    double maiorSupervisao = 0.0, menorSupervisao = 0.0;
+    double maiorOperacional = 0.0, menorOperacional = 0.0;
+    int primeiroGerencia = 1, primeiroSupervisao = 1, primeiroOperacional = 1;
+
+    for (int i = 0; i < numRegistros; i++) {
+        switch (registros[i].categoria) {
+            case 1:
+                if (primeiroGerencia) {
+                    maiorGerencia = registros[i].salario;
+                    menorGerencia = registros[i].salario;
+                    primeiroGerencia = 0;
+                } else {
+                    if (registros[i].salario > maiorGerencia) {
+                        maiorGerencia = registros[i].salario;
+                    }
+                    if (registros[i].salario < menorGerencia) {
+                        menorGerencia = registros[i].salario;
+                    }
+                }
+                break;
+            case 2:
+                if (primeiroSupervisao) {
+                    maiorSupervisao = registros[i].salario;
+                    menorSupervisao = registros[i].salario;
+                    primeiroSupervisao = 0;
+                } else {
+                    if (registros[i].salario > maiorSupervisao) {
+                        maiorSupervisao = registros[i].salario;
+                    }
+                    if (registros[i].salario < menorSupervisao) {
+                        menorSupervisao = registros[i].salario;
+                    }
+                }
+                break;
+            case 3:
+                if (primeiroOperacional) {
+                    maiorOperacional = registros[i].salario;
+                    menorOperacional = registros[i].salario;
+                    primeiroOperacional = 0;
+                } else {
+                    if (registros[i].salario > maiorOperacional) {
+                        maiorOperacional = registros[i].salario;
+                    }
+                    if (registros[i].salario < menorOperacional) {
+                        menorOperacional = registros[i].salario;
+                    }
+                }
+                break;
+        }
+    }
+
+    printf("Relatório: Maior e menor salário por categoria\n");
+    printf("Gerência: Maior - %.2lf, Menor - %.2lf\n", maiorGerencia, menorGerencia);
+    printf("Supervisão: Maior - %.2lf, Menor - %.2lf\n", maiorSupervisao, menorSupervisao);
+    printf("Operacional: Maior - %.2lf, Menor - %.2lf\n", maiorOperacional, menorOperacional);
+}
+
+void relatorioMediaIdadePorCategoria() {
+    int totalGerencia = 0, totalSupervisao = 0, totalOperacional = 0;
+    int somaIdadeGerencia = 0, somaIdadeSupervisao = 0, somaIdadeOperacional = 0;
+
+    for (int i = 0; i < numRegistros; i++) {
+        switch (registros[i].categoria) {
+            case 1:
+                somaIdadeGerencia += registros[i].idade;
+                totalGerencia++;
+                break;
+            case 2:
+                somaIdadeSupervisao += registros[i].idade;
+                totalSupervisao++;
+                break;
+            case 3:
+                somaIdadeOperacional += registros[i].idade;
+                totalOperacional++;
+                break;
+        }
+    }
+
+    double mediaIdadeGerencia = (totalGerencia > 0) ? (double)somaIdadeGerencia / totalGerencia : 0.0;
+    double mediaIdadeSupervisao = (totalSupervisao > 0) ? (double)somaIdadeSupervisao / totalSupervisao : 0.0;
+    double mediaIdadeOperacional = (totalOperacional > 0) ? (double)somaIdadeOperacional / totalOperacional : 0.0;
+
+    printf("Relatório: Média de idade por categoria\n");
+    printf("Gerência: %.2lf\n", mediaIdadeGerencia);
+    printf("Supervisão: %.2lf\n", mediaIdadeSupervisao);
+    printf("Operacional: %.2lf\n", mediaIdadeOperacional);
+}
+
+void relatorioQuantidadeFuncionariosPorFaixaSalarial() {
+    int faixa1_2 = 0, faixa3_4 = 0, faixa5_6 = 0, faixa7_8 = 0, acima8 = 0;
+    double salarioMinimo = 1000.0;
+
+    for (int i = 0; i < numRegistros; i++) {
+        if (registros[i].salario >= salarioMinimo && registros[i].salario < 2 * salarioMinimo) {
+            faixa1_2++;
+        } else if (registros[i].salario >= 2 * salarioMinimo && registros[i].salario < 4 * salarioMinimo) {
+            faixa3_4++;
+        } else if (registros[i].salario >= 4 * salarioMinimo && registros[i].salario < 6 * salarioMinimo) {
+            faixa5_6++;
+        } else if (registros[i].salario >= 6 * salarioMinimo && registros[i].salario < 8 * salarioMinimo) {
+            faixa7_8++;
+        } else if (registros[i].salario >= 8 * salarioMinimo) {
+            acima8++;
+        }
+    }
+
+    printf("Relatório: Quantidade de funcionários por faixa salarial\n");
+    printf("1-2 salários mínimos: %d\n", faixa1_2);
+    printf("3-4 salários mínimos: %d\n", faixa3_4);
+    printf("5-6 salários mínimos: %d\n", faixa5_6);
+    printf("7-8 salários mínimos: %d\n", faixa7_8);
+    printf("Acima de 8 salários mínimos: %d\n", acima8);
+}
+
+void relatorioFuncionarioMaisNovo() {
+    if (numRegistros == 0) {
+        printf("Nenhum funcionário cadastrado!\n");
+        return;
+    }
+
+    int indiceMaisNovo = 0;
+
+    for (int i = 1; i < numRegistros; i++) {
+        if (registros[i].idade < registros[indiceMaisNovo].idade) {
+            indiceMaisNovo = i;
+        }
+    }
+
+    printf("Relatório: Funcionário mais novo\n");
+    printf("Nome: %s\n", registros[indiceMaisNovo].nome);
+    printf("Salário: %.2lf\n", registros[indiceMaisNovo].salario);
+    printf("Categoria: %d\n", registros[indiceMaisNovo].categoria);
+    printf("Idade: %d\n", registros[indiceMaisNovo].idade);
+}
+
+
