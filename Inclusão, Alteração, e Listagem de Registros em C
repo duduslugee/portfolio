@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_NOME 20
+
+typedef struct {
+    char nome[MAX_NOME];
+    int idade;
+} Registro;
+
+void cadastrarRegistro(FILE *arquivo) {
+    Registro registro;
+    printf("Digite o nome: ");
+    scanf("%s", registro.nome);
+    printf("Digite a idade: ");
+    scanf("%d", &registro.idade);
+    getchar(); // Limpa o buffer do teclado
+
+    fwrite(&registro, sizeof(Registro), 1, arquivo);
+    printf("Registro cadastrado com sucesso!\n");
+}
+
+void alterarRegistro(FILE *arquivo) {
+    int numRegistro;
+    printf("Digite o número do registro que deseja alterar: ");
+    scanf("%d", &numRegistro);
+    getchar(); // Limpa o buffer do teclado
+
+    fseek(arquivo, numRegistro * sizeof(Registro), SEEK_SET);
+    Registro registro;
+    fread(&registro, sizeof(Registro), 1, arquivo);
+
+    if (registro.nome[0] == '\0') {
+        printf("Registro não encontrado.\n");
+        return;
+    }
+
+    printf("Registro encontrado: %s - %d\n", registro.nome, registro.idade);
+    printf("Digite o novo nome: ");
+    scanf("%s", registro.nome);
+    printf("Digite a nova idade: ");
+    scanf("%d", &registro.idade);
+    getchar(); // Limpa o buffer do teclado
+
+    fseek(arquivo, -sizeof(Registro), SEEK_CUR);
+    fwrite(&registro, sizeof(Registro), 1, arquivo);
+    printf("Registro alterado com sucesso!\n");
+}
+
+void listarRegistros(FILE *arquivo) {
+    rewind(arquivo);
+    Registro registro;
+    int numRegistro = 0;
+
+    while (fread(&registro, sizeof(Registro), 1, arquivo)) {
+        if (registro.nome[0] != '\0') {
+            printf("Registro %d: %s - %d\n", numRegistro, registro.nome, registro.idade);
+            numRegistro++;
+        }
+    }
+
+    if (numRegistro == 0) {
+        printf("Nenhum registro encontrado.\n");
+    }
+}
+
+int main() {
+    FILE *arquivo;
+    arquivo = fopen("registros.bin", "r+b");
+
+    if (arquivo == NULL) {
+        arquivo = fopen("registros.bin", "w+b");
+        if (arquivo == NULL) {
+            printf("Erro ao abrir o arquivo.\n");
+            return 1;
+        }
+    }
+
+    int opcao;
+    do {
+        printf("\nMenu:\n");
+        printf("1 - Cadastrar novo registro\n");
+        printf("2 - Alterar registro\n");
+        printf("3 - Listar registros\n");
+        printf("0 - Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar(); // Limpa o buffer do teclado
+
+        switch (opcao) {
+            case 1:
+                cadastrarRegistro(arquivo);
+                break;
+            case 2:
+                alterarRegistro(arquivo);
+                break;
+            case 3:
+                listarRegistros(arquivo);
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida.\n");
+                break;
+        }
+    } while (opcao != 0);
+
+    fclose(arquivo);
+    return 0;
+}
